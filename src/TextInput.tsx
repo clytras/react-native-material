@@ -360,6 +360,8 @@ const TextInput = React.forwardRef<TextInputHandle, TextInputProps>(
                           inputRange: [0, 1],
                           outputRange: [0, variant === 'filled' ? -12 : variant === 'outlined' ? -28 : -24],
                         }),
+                      },
+                      {
                         translateX: activeAnimation.interpolate({
                           inputRange: [0, 1],
                           outputRange: [
