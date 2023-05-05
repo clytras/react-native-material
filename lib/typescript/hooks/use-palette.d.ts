@@ -1,1 +1,1 @@
-export declare const usePalette: () => import("rn-material").Palette;
+export declare const usePalette: () => import("../base/ThemeContext").Palette;
