@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import {
   Animated,
   Easing,
@@ -87,9 +87,18 @@ export interface TextInputProps extends RNTextInputProps {
    * The style of the text input's trailing element container.
    */
   trailingContainerStyle?: StyleProp<ViewStyle>;
+
+  leadingSize?: number;
 }
 
-const TextInput: React.FC<TextInputProps> = React.forwardRef(
+export interface TextInputHandle {
+  triggerFocus: () => void;
+  triggerBlur: () => void;
+}
+
+const DefaultLeadingWidth = 24;
+
+const TextInput = React.forwardRef<TextInputHandle, TextInputProps>(
   (
     {
       variant = 'filled',
@@ -105,6 +114,7 @@ const TextInput: React.FC<TextInputProps> = React.forwardRef(
       inputStyle,
       leadingContainerStyle,
       trailingContainerStyle,
+      leadingSize = DefaultLeadingWidth,
 
       placeholder,
       onFocus,
@@ -120,13 +130,13 @@ const TextInput: React.FC<TextInputProps> = React.forwardRef(
     const palette = usePaletteColor(color);
 
     const leadingNode =
-      typeof leading === 'function' ? leading({ color: surfaceScale(0.62).hex(), size: 24 }) : leading;
+      typeof leading === 'function' ? leading({ color: surfaceScale(0.62).hex(), size: leadingSize }) : leading;
 
     const trailingNode =
       typeof trailing === 'function'
         ? trailing({
             color: surfaceScale(0.62).hex(),
-            size: 24,
+            size: leadingSize,
           })
         : trailing;
 
@@ -166,6 +176,19 @@ const TextInput: React.FC<TextInputProps> = React.forwardRef(
       [onBlur]
     );
 
+    useImperativeHandle(
+      ref,
+      () => ({
+        triggerFocus() {
+          setFocused(true);
+        },
+        triggerBlur() {
+          setFocused(false);
+        },
+      }),
+      [setFocused]
+    );
+
     const focusAnimation = useMemo(() => new Animated.Value(0), []);
 
     useEffect(() => {
@@ -175,11 +198,11 @@ const TextInput: React.FC<TextInputProps> = React.forwardRef(
         easing: Easing.out(Easing.ease),
         useNativeDriver: false,
       }).start();
-    }, [focused]);
+    }, [focusAnimation, focused]);
 
     const active = useMemo(() => focused || (rest.value?.length || 0) > 0, [focused, rest.value]);
 
-    const activeAnimation = useMemo(() => new Animated.Value(active ? 1 : 0), []);
+    const activeAnimation = useMemo(() => new Animated.Value(active ? 1 : 0), [active]);
 
     useEffect(() => {
       Animated.timing(activeAnimation, {
@@ -188,7 +211,7 @@ const TextInput: React.FC<TextInputProps> = React.forwardRef(
         easing: Easing.out(Easing.ease),
         useNativeDriver: false,
       }).start();
-    }, [active]);
+    }, [active, activeAnimation]);
 
     const styles = useStyles(
       () => ({
@@ -215,7 +238,7 @@ const TextInput: React.FC<TextInputProps> = React.forwardRef(
         leading: {
           justifyContent: 'center',
           alignItems: 'center',
-          width: 24,
+          width: leadingSize,
           height: 24,
           marginStart: variant === 'standard' ? 0 : 12,
           marginVertical: variant === 'standard' ? 12 : 16,
@@ -260,7 +283,7 @@ const TextInput: React.FC<TextInputProps> = React.forwardRef(
           justifyContent: 'center',
           position: 'absolute',
           top: 0,
-          start: variant === 'standard' ? (leadingNode ? 36 : 0) : leadingNode ? 48 : 16,
+          start: variant === 'standard' ? (leadingNode ? leadingSize + 12 : 0) : leadingNode ? leadingSize + 24 : 16,
           height: variant === 'standard' ? 48 : 56,
         },
         helperText: {
@@ -336,6 +359,19 @@ const TextInput: React.FC<TextInputProps> = React.forwardRef(
                         translateY: activeAnimation.interpolate({
                           inputRange: [0, 1],
                           outputRange: [0, variant === 'filled' ? -12 : variant === 'outlined' ? -28 : -24],
+                        }),
+                        translateX: activeAnimation.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [
+                            0,
+                            variant === 'standard'
+                              ? leadingNode
+                                ? -(leadingSize + 12)
+                                : 0
+                              : leadingNode
+                              ? -(leadingSize + 24)
+                              : -16,
+                          ],
                         }),
                       },
                     ],
