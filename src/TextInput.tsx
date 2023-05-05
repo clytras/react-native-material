@@ -237,7 +237,7 @@ const TextInput = React.forwardRef<TextInputHandle, TextInputProps>(
           alignItems: 'center',
           width: leadingSize,
           height: 24,
-          marginStart: variant === 'standard' ? 0 : 12,
+          marginStart: variant === 'standard' ? 0 : 16,
           marginVertical: variant === 'standard' ? 12 : 16,
         },
         trailing: {
@@ -279,7 +279,7 @@ const TextInput = React.forwardRef<TextInputHandle, TextInputProps>(
         labelContainer: {
           justifyContent: 'center',
           position: 'absolute',
-          top: 0,
+          top: 10,
           start: variant === 'standard' ? (leadingNode ? leadingSize + 12 : 0) : leadingNode ? leadingSize + 24 : 16,
           height: variant === 'standard' ? 48 : 56,
         },
@@ -307,7 +307,7 @@ const TextInput = React.forwardRef<TextInputHandle, TextInputProps>(
             style={[
               styles.input,
               theme.typography.subtitle1,
-              { paddingTop: variant === 'filled' && label ? 18 : 0 },
+              { paddingTop: variant === 'filled' && label ? 24 : 20 },
               inputStyle,
             ]}
             placeholder={label ? (focused ? placeholder : undefined) : placeholder}
@@ -355,7 +355,7 @@ const TextInput = React.forwardRef<TextInputHandle, TextInputProps>(
                       {
                         translateY: activeAnimation.interpolate({
                           inputRange: [0, 1],
-                          outputRange: [0, variant === 'filled' ? -12 : variant === 'outlined' ? -28 : -24],
+                          outputRange: [0, variant === 'filled' ? -24 : variant === 'outlined' ? -28 : -24],
                         }),
                       },
                       {
@@ -368,7 +368,7 @@ const TextInput = React.forwardRef<TextInputHandle, TextInputProps>(
                                 ? -(leadingSize + 12)
                                 : 0
                               : leadingNode
-                              ? -leadingSize
+                              ? -(leadingSize + 8)
                               : 0,
                           ],
                         }),
