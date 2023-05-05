@@ -176,18 +176,14 @@ const TextInput = React.forwardRef<TextInputHandle, TextInputProps>(
       [onBlur]
     );
 
-    useImperativeHandle(
-      ref,
-      () => ({
-        triggerFocus() {
-          setFocused(true);
-        },
-        triggerBlur() {
-          setFocused(false);
-        },
-      }),
-      [setFocused]
-    );
+    useImperativeHandle(ref, () => ({
+      triggerFocus() {
+        setFocused(true);
+      },
+      triggerBlur() {
+        setFocused(false);
+      },
+    }));
 
     const focusAnimation = useMemo(() => new Animated.Value(0), []);
 
@@ -202,7 +198,8 @@ const TextInput = React.forwardRef<TextInputHandle, TextInputProps>(
 
     const active = useMemo(() => focused || (rest.value?.length || 0) > 0, [focused, rest.value]);
 
-    const activeAnimation = useMemo(() => new Animated.Value(active ? 1 : 0), [active]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const activeAnimation = useMemo(() => new Animated.Value(active ? 1 : 0), []);
 
     useEffect(() => {
       Animated.timing(activeAnimation, {
@@ -371,8 +368,8 @@ const TextInput = React.forwardRef<TextInputHandle, TextInputProps>(
                                 ? -(leadingSize + 12)
                                 : 0
                               : leadingNode
-                              ? -(leadingSize + 24)
-                              : -16,
+                              ? -leadingSize
+                              : 0,
                           ],
                         }),
                       },
