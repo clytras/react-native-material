@@ -65,6 +65,7 @@ export interface TextInputProps extends RNTextInputProps {
      */
     trailingContainerStyle?: StyleProp<ViewStyle>;
     leadingSize?: number;
+    error?: boolean;
 }
 export interface TextInputHandle {
     triggerFocus: () => void;

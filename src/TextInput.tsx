@@ -89,6 +89,7 @@ export interface TextInputProps extends RNTextInputProps {
   trailingContainerStyle?: StyleProp<ViewStyle>;
 
   leadingSize?: number;
+  error?: boolean;
 }
 
 export interface TextInputHandle {
@@ -115,6 +116,7 @@ const TextInput = React.forwardRef<TextInputHandle, TextInputProps>(
       leadingContainerStyle,
       trailingContainerStyle,
       leadingSize = DefaultLeadingWidth,
+      error = false,
 
       placeholder,
       onFocus,
@@ -284,7 +286,8 @@ const TextInput = React.forwardRef<TextInputHandle, TextInputProps>(
           height: variant === 'standard' ? 48 : 56,
         },
         helperText: {
-          color: surfaceScale(0.6).hex(),
+          color: error ? palette.main : surfaceScale(0.6).hex(),
+          fontSize: theme.typography.subtitle2.fontSize ?? 14,
         },
       }),
       [palette.main, surfaceScale, !!leadingNode, !!trailingNode, variant, focused, hovered]
