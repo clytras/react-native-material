@@ -90,6 +90,7 @@ export interface TextInputProps extends RNTextInputProps {
 
   leadingSize?: number;
   error?: boolean;
+  adjustLabelPositionY?: number;
 }
 
 export interface TextInputHandle {
@@ -117,6 +118,7 @@ const TextInput = React.forwardRef<TextInputHandle, TextInputProps>(
       trailingContainerStyle,
       leadingSize = DefaultLeadingWidth,
       error = false,
+      adjustLabelPositionY = 0,
 
       placeholder,
       onFocus,
@@ -131,6 +133,7 @@ const TextInput = React.forwardRef<TextInputHandle, TextInputProps>(
 
     const palette = usePaletteColor(color);
 
+    const hasLeading = Boolean(leading);
     const leadingNode =
       typeof leading === 'function' ? leading({ color: surfaceScale(0.62).hex(), size: leadingSize }) : leading;
 
@@ -273,15 +276,15 @@ const TextInput = React.forwardRef<TextInputHandle, TextInputProps>(
         outlineLabelGap: {
           position: 'absolute',
           top: 0,
-          start: -4,
-          end: -4,
+          start: -((hasLeading ? leadingSize + 8 : 0) + 4),
+          end: (hasLeading ? leadingSize + 8 : 0) - 4,
           height: focused ? 2 : 1,
           backgroundColor: surfaceScale(0).hex(),
         },
         labelContainer: {
           justifyContent: 'center',
           position: 'absolute',
-          top: 10,
+          top: adjustLabelPositionY,
           start: variant === 'standard' ? (leadingNode ? leadingSize + 12 : 0) : leadingNode ? leadingSize + 24 : 16,
           height: variant === 'standard' ? 48 : 56,
         },
@@ -310,7 +313,7 @@ const TextInput = React.forwardRef<TextInputHandle, TextInputProps>(
             style={[
               styles.input,
               theme.typography.subtitle1,
-              { paddingTop: variant === 'filled' && label ? 24 : 20 },
+              { paddingTop: variant === 'filled' && label ? 18 : 14 },
               inputStyle,
             ]}
             placeholder={label ? (focused ? placeholder : undefined) : placeholder}
@@ -358,7 +361,10 @@ const TextInput = React.forwardRef<TextInputHandle, TextInputProps>(
                       {
                         translateY: activeAnimation.interpolate({
                           inputRange: [0, 1],
-                          outputRange: [0, variant === 'filled' ? -24 : variant === 'outlined' ? -28 : -24],
+                          outputRange: [
+                            0,
+                            variant === 'filled' ? -(14 + adjustLabelPositionY) : variant === 'outlined' ? -28 : -24,
+                          ],
                         }),
                       },
                       {
